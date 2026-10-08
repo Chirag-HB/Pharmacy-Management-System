@@ -1,0 +1,65 @@
+/**
+ * MediCore Printable Tax Invoice Stylesheet
+ * High-fidelity print styles for physical POS thermal / A4 laser printers
+ */
+
+@media print {
+  /* Hide all app chrome */
+  body, html {
+    background: #ffffff !important;
+    color: #000000 !important;
+    font-size: 11pt !important;
+    margin: 0 !important;
+    padding: 0 !important;
+  }
+
+  .sidebar,
+  .top-header,
+  .toast-container,
+  .view-container,
+  .modal-header,
+  .modal-actions-bar,
+  .no-print {
+    display: none !important;
+  }
+
+  .modal-overlay {
+    position: static !important;
+    background: none !important;
+    backdrop-filter: none !important;
+    padding: 0 !important;
+    visibility: visible !important;
+    opacity: 1 !important;
+  }
+
+  .modal-container {
+    border: none !important;
+    box-shadow: none !important;
+    max-width: 100% !important;
+    max-height: none !important;
+    overflow: visible !important;
+    transform: none !important;
+  }
+
+  .modal-body {
+    padding: 0 !important;
+    overflow: visible !important;
+  }
+
+  .tax-invoice-sheet {
+    border: none !important;
+    padding: 0 !important;
+    box-shadow: none !important;
+  }
+
+  .invoice-table th {
+    background-color: #f1f5f9 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  .grand-total-line {
+    font-size: 13pt !important;
+    font-weight: bold !important;
+  }
+}

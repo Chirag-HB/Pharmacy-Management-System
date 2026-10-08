@@ -1,0 +1,218 @@
+/**
+ * MediCore Healthcare Design System
+ * Unified Design Tokens & Color Palettes
+ * Commercial SaaS Grade - High Usability & Accessible Hierarchy
+ */
+
+:root {
+  /* =========================================================================
+     1. TYPOGRAPHY SYSTEM
+     ========================================================================= */
+  --font-family-sans: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+  --font-family-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+
+  /* Font Sizes */
+  --font-2xs: 0.6875rem; /* 11px */
+  --font-xs: 0.75rem;    /* 12px */
+  --font-sm: 0.8125rem;  /* 13px */
+  --font-base: 0.875rem; /* 14px */
+  --font-md: 0.9375rem;  /* 15px */
+  --font-lg: 1.0625rem;  /* 17px */
+  --font-xl: 1.25rem;    /* 20px */
+  --font-2xl: 1.5rem;    /* 24px */
+  --font-3xl: 1.875rem;  /* 30px */
+
+  /* Font Weights */
+  --weight-regular: 400;
+  --weight-medium: 500;
+  --weight-semibold: 600;
+  --weight-bold: 700;
+  --weight-extrabold: 800;
+
+  /* =========================================================================
+     2. BRAND & CLINICAL ACCENT COLORS
+     ========================================================================= */
+  --color-primary: #0284c7;        /* Medical Sky Blue (Primary) */
+  --color-primary-hover: #0369a1;  /* Darker on hover */
+  --color-primary-active: #075985;
+  --color-primary-light: #e0f2fe;  /* 10% tint for tags/hover */
+  --color-primary-subtle: #f0f9ff; /* 5% tint for surfaces */
+  --color-primary-border: #bae6fd;
+
+  --color-teal: #0d9488;
+  --color-teal-hover: #0f766e;
+  --color-teal-light: #ccfbf1;
+
+  /* =========================================================================
+     3. SEMANTIC STATUS SYSTEM (Accessible Contrast)
+     ========================================================================= */
+  /* Success: In-stock, Paid, Approved, Dispensed */
+  --color-success: #059669;
+  --color-success-hover: #047857;
+  --color-success-bg: #ecfdf5;
+  --color-success-border: #a7f3d0;
+  --color-success-text: #065f46;
+
+  /* Warning: Low stock, Near expiry, Action required */
+  --color-warning: #d97706;
+  --color-warning-hover: #b45309;
+  --color-warning-bg: #fffbeb;
+  --color-warning-border: #fde68a;
+  --color-warning-text: #92400e;
+
+  /* Danger / Critical: Out of stock, Expired, Rejected */
+  --color-danger: #dc2626;
+  --color-danger-hover: #b91c1c;
+  --color-danger-bg: #fef2f2;
+  --color-danger-border: #fecaca;
+  --color-danger-text: #991b1b;
+
+  /* Info / Neutral highlight */
+  --color-info: #0284c7;
+  --color-info-hover: #0369a1;
+  --color-info-bg: #f0f9ff;
+  --color-info-border: #bae6fd;
+  --color-info-text: #0369a1;
+
+  /* Violet / Prescription Schedule H tags */
+  --color-purple: #7c3aed;
+  --color-purple-hover: #6d28d9;
+  --color-purple-bg: #f5f3ff;
+  --color-purple-border: #ddd6fe;
+  --color-purple-text: #5b21b6;
+
+  /* =========================================================================
+     4. LIGHT THEME SURFACES & NEUTRALS
+     ========================================================================= */
+  --bg-app: #f8fafc;               /* Slate 50 canvas */
+  --bg-surface: #ffffff;           /* Clean card surface */
+  --bg-surface-raised: #ffffff;    /* Modals & Popovers */
+  --bg-surface-alt: #f1f5f9;       /* Slate 100 secondary fill */
+  --bg-surface-subtle: #f8fafc;    /* Very light contrast */
+  --bg-input: #ffffff;
+  --bg-header: #ffffff;
+
+  /* Sidebar: Professional Deep Navy (Distinctive Identity) */
+  --bg-sidebar: #0b1324;           /* Deep Obsidian Navy */
+  --bg-sidebar-hover: #152238;     /* Sleek hover highlight */
+  --bg-sidebar-active: #0284c7;    /* Primary highlight */
+  --text-sidebar: #94a3b8;
+  --text-sidebar-muted: #64748b;
+  --text-sidebar-active: #ffffff;
+
+  /* Typography Colors */
+  --text-main: #0f172a;            /* Slate 900 primary text */
+  --text-secondary: #334155;       /* Slate 700 readable body */
+  --text-muted: #64748b;           /* Slate 500 metadata */
+  --text-light: #94a3b8;           /* Slate 400 placeholder */
+  --text-white: #ffffff;
+
+  /* Borders & Dividers */
+  --border-color: #e2e8f0;         /* Slate 200 standard border */
+  --border-subtle: #f1f5f9;       /* Slate 100 subtle divider */
+  --border-strong: #cbd5e1;       /* Slate 300 emphasized border */
+  --border-focus: #0284c7;
+
+  /* Focus Ring */
+  --focus-ring: 0 0 0 3px rgba(2, 132, 199, 0.22);
+  --focus-ring-danger: 0 0 0 3px rgba(220, 38, 38, 0.22);
+
+  /* =========================================================================
+     5. ELEVATION SHADOWS (Layered, Soft, Non-intrusive)
+     ========================================================================= */
+  --shadow-xs: 0 1px 2px 0 rgba(15, 23, 42, 0.05);
+  --shadow-sm: 0 1px 3px 0 rgba(15, 23, 42, 0.08), 0 1px 2px -1px rgba(15, 23, 42, 0.08);
+  --shadow-md: 0 4px 6px -1px rgba(15, 23, 42, 0.07), 0 2px 4px -2px rgba(15, 23, 42, 0.06);
+  --shadow-lg: 0 10px 15px -3px rgba(15, 23, 42, 0.08), 0 4px 6px -4px rgba(15, 23, 42, 0.04);
+  --shadow-xl: 0 20px 25px -5px rgba(15, 23, 42, 0.1), 0 8px 10px -6px rgba(15, 23, 42, 0.04);
+  --shadow-modal: 0 25px 50px -12px rgba(15, 23, 42, 0.25);
+
+  /* =========================================================================
+     6. GEOMETRIC RADIUS SCALE
+     ========================================================================= */
+  --radius-xs: 4px;
+  --radius-sm: 6px;   /* Small badges & tooltips */
+  --radius-md: 8px;   /* Standard buttons, inputs, selects */
+  --radius-lg: 12px;  /* Standard cards, table containers, alerts */
+  --radius-xl: 16px;  /* Modals, large panels */
+  --radius-full: 9999px; /* Pills, avatars, toggle capsules */
+
+  /* Dimensions & Spacing */
+  --sidebar-width: 256px;
+  --header-height: 64px;
+
+  /* Transitions */
+  --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-normal: 0.22s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-smooth: 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* =========================================================================
+   DARK THEME SYSTEM (Commercial Grade Obsidian Palette)
+   ========================================================================= */
+body.dark-theme {
+  /* Surfaces */
+  --bg-app: #090d16;               /* Deep obsidian slate canvas */
+  --bg-surface: #111827;           /* Slate 900 card surface */
+  --bg-surface-raised: #172033;    /* Elevated surface */
+  --bg-surface-alt: #172033;       /* Slate 800 secondary fill */
+  --bg-surface-subtle: #0f172a;
+  --bg-input: #0c1322;
+  --bg-header: #111827;
+
+  /* Sidebar */
+  --bg-sidebar: #060a12;           /* Pure dark navy */
+  --bg-sidebar-hover: #131c2e;
+  --bg-sidebar-active: #0284c7;
+  --text-sidebar: #94a3b8;
+  --text-sidebar-muted: #475569;
+  --text-sidebar-active: #ffffff;
+
+  /* Typography */
+  --text-main: #f8fafc;            /* Crisp primary white */
+  --text-secondary: #cbd5e1;       /* Light slate secondary */
+  --text-muted: #94a3b8;           /* Muted metadata */
+  --text-light: #64748b;
+
+  /* Borders */
+  --border-color: #1f2937;         /* High-contrast slate border */
+  --border-subtle: #172033;
+  --border-strong: #374151;
+  --border-focus: #38bdf8;
+
+  /* Focus Ring */
+  --focus-ring: 0 0 0 3px rgba(56, 189, 248, 0.28);
+
+  /* Semantic Overrides (Dark-friendly tints) */
+  --color-primary-light: rgba(2, 132, 199, 0.18);
+  --color-primary-subtle: rgba(2, 132, 199, 0.1);
+  --color-primary-border: rgba(56, 189, 248, 0.3);
+
+  --color-success-bg: rgba(5, 150, 105, 0.16);
+  --color-success-border: rgba(16, 185, 129, 0.3);
+  --color-success-text: #34d399;
+
+  --color-warning-bg: rgba(217, 119, 6, 0.16);
+  --color-warning-border: rgba(245, 158, 11, 0.3);
+  --color-warning-text: #fbbf24;
+
+  --color-danger-bg: rgba(220, 38, 38, 0.16);
+  --color-danger-border: rgba(239, 68, 68, 0.3);
+  --color-danger-text: #f87171;
+
+  --color-info-bg: rgba(2, 132, 199, 0.16);
+  --color-info-border: rgba(56, 189, 248, 0.3);
+  --color-info-text: #38bdf8;
+
+  --color-purple-bg: rgba(124, 58, 237, 0.16);
+  --color-purple-border: rgba(167, 139, 250, 0.3);
+  --color-purple-text: #c084fc;
+
+  /* Shadows in Dark Mode (Glow / Elevation) */
+  --shadow-xs: 0 1px 2px 0 rgba(0, 0, 0, 0.35);
+  --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.45);
+  --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.5), 0 2px 4px -2px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.7);
+  --shadow-modal: 0 25px 50px -12px rgba(0, 0, 0, 0.85);
+}

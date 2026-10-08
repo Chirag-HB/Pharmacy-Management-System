@@ -1,0 +1,2181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MediCore - Modern Pharmacy Management System</title>
+  <meta name="description" content="MediCore is an intelligent, high-performance Pharmacy Management SaaS platform featuring POS billing, inventory auditing, clinical prescriptions, and analytics.">
+
+  <!-- Google Fonts: Inter -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Font Awesome 6 Icons -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+  <!-- App Stylesheets -->
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/views.css">
+  <link rel="stylesheet" href="css/print.css">
+  <link rel="stylesheet" href="css/auth.css">
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+</head>
+<body>
+
+  <!-- ========================================== -->
+  <!-- DEMO AUTHENTICATION SCREEN (MediCore Gateway) -->
+  <!-- ========================================== -->
+  <div class="login-screen hidden" id="login-screen">
+    <div class="login-ambient-orb login-orb-1"></div>
+    <div class="login-ambient-orb login-orb-2"></div>
+
+    <div class="login-card">
+      <div class="login-brand-header">
+        <div class="login-brand-icon">
+          <i class="fa-solid fa-notes-medical"></i>
+        </div>
+        <h1 class="login-brand-title">Medi<span>Core</span></h1>
+        <p class="login-brand-subtitle">Clinical Pharmacy ERP & Dispensary Gateway</p>
+      </div>
+
+      <!-- Demo Credentials Callout -->
+      <div class="login-demo-callout">
+        <div class="login-demo-badge-row">
+          <div class="login-demo-pill">
+            <i class="fa-solid fa-flask-vial"></i> Demo Mode Gateway
+          </div>
+          <button type="button" class="btn-fill-demo-creds" id="btn-fill-demo-creds" title="Auto-fill demo credentials">
+            <i class="fa-solid fa-wand-magic-sparkles"></i> Quick Fill
+          </button>
+        </div>
+        <div class="login-demo-creds-preview">
+          <span>Email: <code>admin@medicore.com</code></span>
+          <span>Password: <code>admin123</code></span>
+        </div>
+      </div>
+
+      <!-- Error Message Banner -->
+      <div class="login-error-alert" id="login-error-message" style="display: none;">
+        <i class="fa-solid fa-circle-exclamation"></i>
+        <span id="login-error-text">Invalid email or password.</span>
+      </div>
+
+      <!-- Login Form -->
+      <form id="form-login" novalidate>
+        <div class="login-form-group">
+          <label class="login-label" for="login-input-email">
+            <i class="fa-solid fa-envelope"></i> Dispensary Email
+          </label>
+          <div class="login-input-wrapper">
+            <i class="fa-solid fa-at login-input-icon"></i>
+            <input 
+              type="email" 
+              id="login-input-email" 
+              class="login-input" 
+              placeholder="admin@medicore.com" 
+              required 
+              autocomplete="username"
+            />
+          </div>
+        </div>
+
+        <div class="login-form-group">
+          <label class="login-label" for="login-input-password">
+            <i class="fa-solid fa-key"></i> Pharmacist Password
+          </label>
+          <div class="login-input-wrapper">
+            <i class="fa-solid fa-lock login-input-icon"></i>
+            <input 
+              type="password" 
+              id="login-input-password" 
+              class="login-input" 
+              placeholder="••••••••" 
+              required 
+              autocomplete="current-password"
+            />
+            <button type="button" class="btn-toggle-pwd" id="btn-toggle-password-visibility" aria-label="Toggle password visibility">
+              <i class="fa-solid fa-eye"></i>
+            </button>
+          </div>
+        </div>
+
+        <div class="login-meta-row">
+          <label class="login-remember-label">
+            <input type="checkbox" id="login-remember-me" checked />
+            <span>Keep session active</span>
+          </label>
+          <span class="text-xs text-muted" style="color: #64748b;">Terminal #04</span>
+        </div>
+
+        <button type="submit" class="btn-login-submit" id="btn-login-submit">
+          <span>Sign In to Dispensary</span>
+          <i class="fa-solid fa-arrow-right"></i>
+        </button>
+      </form>
+
+      <div class="login-footer-note">
+        <i class="fa-solid fa-shield-halved"></i>
+        <span>HIPAA & GxP compliant demo dispensary environment</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- Application Shell -->
+  <div class="app-shell">
+    
+    <!-- Left Sidebar Backdrop for Mobile -->
+    <div class="sidebar-backdrop" id="sidebar-backdrop"></div>
+
+    <!-- ===================== LEFT SIDEBAR ===================== -->
+    <aside class="sidebar" id="app-sidebar">
+      <div class="sidebar-header">
+        <div class="brand-icon-wrapper">
+          <i class="fa-solid fa-notes-medical"></i>
+        </div>
+        <div class="brand-text-block">
+          <div class="brand-title">Medi<span class="brand-accent">Core</span></div>
+          <div class="brand-subtitle" id="app-brand-store-name">Pharmacy ERP</div>
+        </div>
+      </div>
+
+      <nav class="sidebar-nav">
+        <div class="nav-section-label">Core Operations</div>
+        <a class="nav-item active" data-view="dashboard" id="nav-dashboard">
+          <i class="fa-solid fa-chart-pie"></i>
+          <span>Dashboard</span>
+        </a>
+        <a class="nav-item" data-view="pos" id="nav-pos">
+          <i class="fa-solid fa-cash-register"></i>
+          <span>Point of Sale</span>
+          <span class="badge badge-success text-2xs nav-badge">POS</span>
+        </a>
+        <a class="nav-item" data-view="medicines" id="nav-medicines">
+          <i class="fa-solid fa-pills"></i>
+          <span>Medicines</span>
+        </a>
+        <a class="nav-item" data-view="inventory" id="nav-inventory">
+          <i class="fa-solid fa-boxes-stacked"></i>
+          <span>Inventory</span>
+        </a>
+        <a class="nav-item" data-view="prescriptions" id="nav-prescriptions">
+          <i class="fa-solid fa-file-prescription"></i>
+          <span>Prescriptions</span>
+        </a>
+
+        <div class="nav-section-label">Management</div>
+        <a class="nav-item" data-view="customers" id="nav-customers">
+          <i class="fa-solid fa-users"></i>
+          <span>Customers</span>
+        </a>
+        <a class="nav-item" data-view="suppliers" id="nav-suppliers">
+          <i class="fa-solid fa-truck-field"></i>
+          <span>Suppliers</span>
+        </a>
+        <a class="nav-item" data-view="analytics" id="nav-analytics">
+          <i class="fa-solid fa-chart-line"></i>
+          <span>Analytics</span>
+        </a>
+        <a class="nav-item" data-view="alerts" id="nav-alerts">
+          <i class="fa-solid fa-bell"></i>
+          <span>Alerts</span>
+          <span class="badge badge-danger text-2xs nav-badge" id="sidebar-alert-badge">3</span>
+        </a>
+
+        <div class="nav-section-label">System</div>
+        <a class="nav-item" data-view="settings" id="nav-settings">
+          <i class="fa-solid fa-sliders"></i>
+          <span>Settings</span>
+        </a>
+      </nav>
+
+      <!-- Sidebar User Profile -->
+      <div class="sidebar-footer">
+        <div class="user-mini-profile">
+          <div class="user-avatar">
+            <i class="fa-solid fa-user-doctor"></i>
+          </div>
+          <div class="user-info">
+            <span class="user-name">Pharm. Arjun M.</span>
+            <span class="user-role">Licensed Incharge</span>
+          </div>
+          <button type="button" class="btn-sidebar-logout" id="btn-sidebar-logout" title="Sign Out of Dispensary" aria-label="Sign Out">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          </button>
+        </div>
+      </div>
+    </aside>
+
+    <!-- ===================== MAIN CONTENT CONTAINER ===================== -->
+    <div class="main-layout">
+      
+      <!-- Top Navigation Header -->
+      <header class="top-header">
+        <div class="header-left">
+          <button type="button" class="btn-sidebar-hamburger" id="btn-sidebar-toggle" aria-label="Toggle Sidebar Navigation">
+            <i class="fa-solid fa-bars"></i>
+          </button>
+          
+          <div class="global-search-container">
+            <div class="search-input-wrapper">
+              <i class="fa-solid fa-magnifying-glass"></i>
+              <input type="text" id="header-global-search" class="global-search-input" placeholder="Search medicines, batches, customers, Rx... (Ctrl+K)" autocomplete="off">
+              <span class="search-kbd-pill">/</span>
+            </div>
+            <!-- Global Live Search Results Dropdown -->
+            <div class="search-results-dropdown" id="header-search-results-dropdown"></div>
+          </div>
+        </div>
+
+        <div class="header-right">
+          <button type="button" class="header-btn-quick-sale" id="btn-header-quick-sale">
+            <i class="fa-solid fa-bolt"></i>
+            <span>New Sale (F2)</span>
+          </button>
+
+          <button type="button" class="btn-header-action" id="btn-header-theme-toggle" title="Toggle Dark/Light Mode" aria-label="Toggle theme">
+            <i class="fa-solid fa-moon"></i>
+          </button>
+
+            <div class="notifications-dropdown-wrapper">
+              <button type="button" class="btn-header-action" id="btn-header-notifications" title="View Alerts & Notifications" aria-label="View notifications">
+                <i class="fa-solid fa-bell"></i>
+                <span class="header-badge-count" id="header-alert-badge">0</span>
+              </button>
+
+              <!-- Notifications Dropdown Menu -->
+              <div class="notifications-dropdown-menu" id="header-notifications-dropdown">
+                <div class="notif-dropdown-header">
+                <div class="flex items-center gap-2">
+                  <span class="font-bold text-sm text-main">Notifications</span>
+                  <span class="badge badge-primary text-2xs" id="notif-dropdown-badge">0 Unread</span>
+                </div>
+                <div class="flex items-center gap-2">
+                  <button type="button" class="btn btn-sm btn-outline text-2xs py-1 px-2" id="btn-notif-mark-all-read" title="Mark all notifications as read">
+                    <i class="fa-solid fa-check-double"></i> Mark All Read
+                  </button>
+                  <button type="button" class="btn btn-icon btn-sm" id="btn-notif-clear-all" title="Clear all notifications">
+                    <i class="fa-solid fa-trash-can text-muted"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Notification items container -->
+              <div class="notif-dropdown-body" id="header-notifications-list" style="max-height: 380px; overflow-y: auto; padding: 0.5rem 0;"></div>
+
+              <div class="notif-dropdown-footer" style="padding: 0.65rem 1rem; border-top: 1px solid var(--border-color); text-align: center; background: var(--bg-surface-alt); border-bottom-left-radius: var(--radius-lg); border-bottom-right-radius: var(--radius-lg);">
+                <button type="button" class="btn btn-sm btn-link text-primary text-xs font-semibold w-full" id="btn-notif-view-all-alerts">
+                  View All Alerts Center <i class="fa-solid fa-arrow-right ml-1"></i>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="header-user-badge">
+            <div class="avatar-circle"><i class="fa-solid fa-user-check"></i></div>
+            <span>Indiranagar Branch</span>
+          </div>
+
+          <button type="button" class="btn-header-logout" id="btn-header-logout" title="Sign Out of Dispensary" aria-label="Sign Out">
+            <i class="fa-solid fa-arrow-right-from-bracket"></i>
+          </button>
+        </div>
+      </header>
+
+      <!-- Scrollable Main View Container -->
+      <main class="main-content-scroll" id="main-content-scroll">
+
+        <!-- ========================================== -->
+        <!-- 1. DASHBOARD VIEW                         -->
+        <!-- ========================================== -->
+        <section class="view-container active" id="view-dashboard">
+          <div class="view-header">
+            <div class="view-title-block">
+              <h1>Pharmacy Operations Dashboard</h1>
+              <p>Live snapshot of daily sales, inventory levels, critical alerts, and dispensed prescriptions</p>
+            </div>
+            <div class="view-actions-bar">
+              <button type="button" class="btn btn-primary" id="dash-btn-new-sale">
+                <i class="fa-solid fa-cart-plus"></i> New POS Sale
+              </button>
+              <button type="button" class="btn btn-secondary" id="dash-btn-add-med">
+                <i class="fa-solid fa-plus"></i> Add Medicine
+              </button>
+              <button type="button" class="btn btn-outline" id="dash-btn-new-rx">
+                <i class="fa-solid fa-file-arrow-up"></i> Upload Rx
+              </button>
+              <button type="button" class="btn btn-outline" id="dash-btn-view-alerts">
+                <i class="fa-solid fa-bell"></i> View Alerts
+              </button>
+            </div>
+          </div>
+
+          <!-- KPI Metric Cards Grid -->
+          <div class="metrics-grid-6">
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Today's Revenue</span>
+                <span class="metric-value text-primary" id="kpi-today-revenue">₹0.00</span>
+                <span class="metric-trend trend-up"><i class="fa-solid fa-arrow-trend-up"></i> +14.2% vs avg</span>
+              </div>
+              <div class="metric-icon-box metric-icon-blue">
+                <i class="fa-solid fa-indian-rupee-sign"></i>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Total Medicines</span>
+                <span class="metric-value" id="kpi-total-medicines">0</span>
+                <span class="metric-trend text-muted">Active SKUs</span>
+              </div>
+              <div class="metric-icon-box metric-icon-green">
+                <i class="fa-solid fa-capsules"></i>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Low Stock</span>
+                <span class="metric-value text-warning" id="kpi-low-stock">0</span>
+                <span class="metric-trend text-warning font-semibold"><i class="fa-solid fa-triangle-exclamation"></i> Action required</span>
+              </div>
+              <div class="metric-icon-box metric-icon-amber">
+                <i class="fa-solid fa-boxes-stacked"></i>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Expiring Soon</span>
+                <span class="metric-value text-danger" id="kpi-expiring-meds">0</span>
+                <span class="metric-trend text-danger font-semibold"><i class="fa-solid fa-clock"></i> &lt; 60 Days</span>
+              </div>
+              <div class="metric-icon-box metric-icon-rose">
+                <i class="fa-solid fa-hourglass-half"></i>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Today's Orders</span>
+                <span class="metric-value" id="kpi-today-orders">0</span>
+                <span class="metric-trend trend-up"><i class="fa-solid fa-receipt"></i> Dispensed</span>
+              </div>
+              <div class="metric-icon-box metric-icon-purple">
+                <i class="fa-solid fa-basket-shopping"></i>
+              </div>
+            </div>
+
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Customers</span>
+                <span class="metric-value" id="kpi-total-customers">0</span>
+                <span class="metric-trend text-muted">Registered</span>
+              </div>
+              <div class="metric-icon-box metric-icon-blue">
+                <i class="fa-solid fa-users"></i>
+              </div>
+            </div>
+          </div>
+
+          <!-- Charts & Alerts Row -->
+          <div class="dashboard-grid-main">
+            <!-- Left: Sales Performance Chart -->
+            <div class="card">
+              <div class="card-header">
+                <div>
+                  <h3 class="card-title"><i class="fa-solid fa-chart-simple text-primary"></i> 7-Day Revenue & Order Trend</h3>
+                  <p class="card-subtitle">Daily dispensary counter gross revenue and transaction volume</p>
+                </div>
+              </div>
+              <div class="card-body">
+                <div class="chart-card-container">
+                  <canvas id="chart-dashboard-sales"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <!-- Right: Pharmacy Health Score Highlight Card -->
+            <div class="health-score-card" id="pharmacy-health-card">
+              <div class="health-card-header">
+                <div class="health-card-title-wrap">
+                  <i class="fa-solid fa-heart-pulse text-success"></i>
+                  <h3 class="health-card-title">Pharmacy Health Score</h3>
+                </div>
+                <span class="health-status-pill health-status-healthy" id="health-status-badge">
+                  <span class="badge-dot" style="background:#10b981;"></span>
+                  <span id="health-status-text">Healthy</span>
+                </span>
+              </div>
+
+              <!-- Gauge & Score Hero -->
+              <div class="health-score-hero">
+                <!-- Circular Progress Ring (SVG) -->
+                <div class="health-gauge-wrapper">
+                  <svg class="health-gauge-svg" viewBox="0 0 112 112">
+                    <circle class="health-gauge-bg" cx="56" cy="56" r="46"></circle>
+                    <circle class="health-gauge-fill" id="health-gauge-circle" cx="56" cy="56" r="46" style="stroke: #10b981; stroke-dashoffset: 38;"></circle>
+                  </svg>
+                  <div class="health-gauge-center">
+                    <span class="health-score-number" id="health-score-display">87</span>
+                    <span class="health-score-denom">/100</span>
+                  </div>
+                </div>
+
+                <!-- Score Tier Summary & Scale -->
+                <div class="health-tier-summary">
+                  <div class="health-tier-headline" id="health-tier-headline">
+                    <span id="health-tier-icon">🟢</span>
+                    <span id="health-tier-title">Healthy</span>
+                  </div>
+                  <p class="health-tier-desc" id="health-tier-desc">Store operations, stock levels, and dispensing workflows are optimal.</p>
+                  <div class="health-tiers-scale">
+                    <span class="health-scale-pill" id="scale-pill-critical">0-59 Critical</span>
+                    <span class="health-scale-pill" id="scale-pill-attention">60-79 Attention</span>
+                    <span class="health-scale-pill active scale-healthy" id="scale-pill-healthy">80-100 Healthy</span>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Factors Contributing to Score -->
+              <div class="health-factors-section">
+                <div class="health-factors-title">Factors Contributing to Score</div>
+                <div class="health-factors-grid">
+                  <div class="health-factor-row">
+                    <div class="health-factor-header">
+                      <span class="health-factor-label">Stock Health</span>
+                      <span class="health-factor-val" id="health-factor-stock">88%</span>
+                    </div>
+                    <div class="health-factor-track">
+                      <div class="health-factor-fill fill-emerald" id="health-bar-stock" style="width: 88%;"></div>
+                    </div>
+                  </div>
+
+                  <div class="health-factor-row">
+                    <div class="health-factor-header">
+                      <span class="health-factor-label">Low-Stock Ratio</span>
+                      <span class="health-factor-val" id="health-factor-lowstock">92%</span>
+                    </div>
+                    <div class="health-factor-track">
+                      <div class="health-factor-fill fill-teal" id="health-bar-lowstock" style="width: 92%;"></div>
+                    </div>
+                  </div>
+
+                  <div class="health-factor-row">
+                    <div class="health-factor-header">
+                      <span class="health-factor-label">Expiry Control</span>
+                      <span class="health-factor-val" id="health-factor-expiry">84%</span>
+                    </div>
+                    <div class="health-factor-track">
+                      <div class="health-factor-fill fill-sky" id="health-bar-expiry" style="width: 84%;"></div>
+                    </div>
+                  </div>
+
+                  <div class="health-factor-row">
+                    <div class="health-factor-header">
+                      <span class="health-factor-label">Sales Performance</span>
+                      <span class="health-factor-val" id="health-factor-sales">86%</span>
+                    </div>
+                    <div class="health-factor-track">
+                      <div class="health-factor-fill fill-amber" id="health-bar-sales" style="width: 86%;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Dynamic Recommendations Section -->
+              <div class="health-recs-section">
+                <div class="health-recs-header">
+                  <i class="fa-solid fa-lightbulb text-warning"></i> Actionable Recommendations
+                </div>
+                <div class="health-recs-list" id="health-recommendations-list">
+                  <!-- Dynamically populated from actual application data -->
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Bottom Row: Recent Transactions & Priority Alerts / Low Stock -->
+          <div class="dashboard-grid-main">
+            <!-- Recent Transactions Table -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fa-solid fa-receipt text-primary"></i> Recent Invoices & Sales</h3>
+                <button type="button" class="btn btn-sm btn-outline" onclick="App.navigateTo('pos')">Go to Billing</button>
+              </div>
+              <div class="card-body" style="padding: 0;">
+                <div class="table-container" style="border: none;">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th>Invoice No</th>
+                        <th>Customer</th>
+                        <th>Payment</th>
+                        <th>Date & Time</th>
+                        <th class="text-right">Total (₹)</th>
+                        <th class="text-center">Receipt</th>
+                      </tr>
+                    </thead>
+                    <tbody id="dash-recent-transactions-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+
+            <!-- Urgent Alerts, Low Stock & Audit Activities Column -->
+            <div class="flex flex-col gap-4">
+              <!-- Low Stock Medicines Card -->
+              <div class="card">
+                <div class="card-header flex justify-between items-center">
+                  <div>
+                    <h3 class="card-title"><i class="fa-solid fa-boxes-stacked text-warning"></i> Low Stock Medicines</h3>
+                    <p class="card-subtitle">Medicines at or below minimum threshold</p>
+                  </div>
+                  <button type="button" class="btn btn-sm btn-outline" onclick="App.navigateTo('inventory')">Inventory</button>
+                </div>
+                <div class="card-body" style="padding: 0;">
+                  <div class="table-container" style="max-height: 240px; overflow-y: auto; border: none;">
+                    <table class="data-table" id="dash-low-stock-table">
+                      <thead>
+                        <tr>
+                          <th>Medicine</th>
+                          <th>Batch</th>
+                          <th>Stock</th>
+                          <th>Min</th>
+                          <th>Action</th>
+                        </tr>
+                      </thead>
+                      <tbody id="dash-low-stock-tbody">
+                        <!-- rows will be injected by DashboardModule -->
+                      </tbody>
+                    </table>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Urgent Alerts Widget -->
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title text-warning"><i class="fa-solid fa-triangle-exclamation"></i> Critical Alerts</h3>
+                  <button type="button" class="btn btn-sm btn-outline" onclick="App.navigateTo('alerts')">All Alerts</button>
+                </div>
+                <div class="card-body">
+                  <div class="dash-alerts-list" id="dash-alerts-container"></div>
+                </div>
+              </div>
+
+              <!-- Real-time Activity Feed -->
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title"><i class="fa-solid fa-clock-rotate-left text-primary"></i> Live Activity Audit</h3>
+                </div>
+                <div class="card-body">
+                  <div class="timeline-container" id="dash-activity-timeline"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 2. MEDICINES MANAGEMENT VIEW               -->
+        <!-- ========================================== -->
+        <section class="view-container" id="view-medicines">
+          <div class="view-header">
+            <div class="view-title-block">
+              <h1>Medicines Catalog & Batch Control</h1>
+              <p>Manage pharmaceutical drugs, generic combinations, batch numbers, MRP rates, and stock thresholds</p>
+            </div>
+            <div class="view-actions-bar">
+              <button type="button" class="btn btn-outline" id="btn-export-medicines-csv">
+                <i class="fa-solid fa-file-csv"></i> Export CSV
+              </button>
+              <button type="button" class="btn btn-primary" id="btn-add-medicine">
+                <i class="fa-solid fa-plus"></i> Add New Medicine
+              </button>
+            </div>
+          </div>
+
+          <!-- Catalog Summary KPIs -->
+          <div class="metrics-grid-4 mb-4">
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Catalog Size</span>
+                <span class="metric-value" id="med-metric-total">0</span>
+              </div>
+              <div class="metric-icon-box metric-icon-blue"><i class="fa-solid fa-pills"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Total Units in Stock</span>
+                <span class="metric-value text-success" id="med-metric-units">0</span>
+              </div>
+              <div class="metric-icon-box metric-icon-green"><i class="fa-solid fa-boxes-stacked"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Low Stock Drugs</span>
+                <span class="metric-value text-warning" id="med-metric-low">0</span>
+              </div>
+              <div class="metric-icon-box metric-icon-amber"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Out of Stock</span>
+                <span class="metric-value text-danger" id="med-metric-oos">0</span>
+              </div>
+              <div class="metric-icon-box metric-icon-rose"><i class="fa-solid fa-ban"></i></div>
+            </div>
+          </div>
+
+          <!-- Controls Bar: Search, Category, Status, Sort -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="form-grid-4" style="display: grid; grid-template-columns: 2fr 1.2fr 1.2fr 1fr; gap: 1rem;">
+                <div>
+                  <label class="form-label">Search Medicine / Generic / Batch</label>
+                  <input type="text" id="med-search-input" class="form-control" placeholder="Type drug name, paracetamol, batch #...">
+                </div>
+                <div>
+                  <label class="form-label">Therapeutic Category</label>
+                  <select id="med-category-filter" class="form-select">
+                    <option value="All">All Categories</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label">Stock & Expiry Status</label>
+                  <select id="med-status-filter" class="form-select">
+                    <option value="All">All Statuses</option>
+                    <option value="in-stock">Sufficient Stock</option>
+                    <option value="low-stock">Low Stock (≤ Threshold)</option>
+                    <option value="out-of-stock">Out of Stock (0)</option>
+                    <option value="expiring">Expiring Soon (≤ 60d)</option>
+                    <option value="expired">Expired Batches</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="form-label">Sort Catalog By</label>
+                  <select id="med-sort-by" class="form-select">
+                    <option value="name-asc">Name (A to Z)</option>
+                    <option value="name-desc">Name (Z to A)</option>
+                    <option value="price-low">Price (Low to High)</option>
+                    <option value="price-high">Price (High to Low)</option>
+                    <option value="stock-low">Stock (Lowest First)</option>
+                    <option value="stock-high">Stock (Highest First)</option>
+                    <option value="expiry-asc">Expiry Date (Soonest)</option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Main Medicines Data Table -->
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Drug Name & Generic</th>
+                  <th>Category</th>
+                  <th>Batch / Rack</th>
+                  <th>Expiry Date</th>
+                  <th class="text-right">MRP (₹)</th>
+                  <th>Current Stock</th>
+                  <th>Supplier / Agency</th>
+                  <th class="text-center" style="width: 130px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="medicines-table-tbody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 3. POINT OF SALE (POS) VIEW                -->
+        <!-- ========================================== -->
+        <section class="view-container" id="view-pos">
+          <div class="view-header">
+            <div class="view-title-block">
+              <h1>Point of Sale (POS) Billing Counter</h1>
+              <p>Instant drug lookup, real-time inventory deduction, GST calculation, and printable tax invoice</p>
+            </div>
+            <div class="view-actions-bar">
+              <button type="button" class="btn btn-outline" id="btn-pos-clear-cart">
+                <i class="fa-solid fa-trash-can"></i> Clear Cart
+              </button>
+            </div>
+          </div>
+
+          <div class="pos-layout-split">
+            <!-- Left Side: Catalog Search & Quick Add Grid -->
+            <div class="pos-catalog-panel">
+              <div class="card">
+                <div class="card-body" style="padding: 1rem;">
+                  <!-- Catalog Search -->
+                  <div class="search-input-wrapper mb-3">
+                    <i class="fa-solid fa-magnifying-glass"></i>
+                    <input type="text" id="pos-search-input" class="global-search-input" placeholder="Search drug name, generic formula, or batch code...">
+                  </div>
+
+                  <!-- Category Filter Chips -->
+                  <div class="pos-category-chips" id="pos-category-chips"></div>
+                </div>
+              </div>
+
+              <!-- Product Cards Grid -->
+              <div class="pos-catalog-grid" id="pos-catalog-grid"></div>
+            </div>
+
+            <!-- Right Side: Billing Cart Terminal & Checkout -->
+            <div class="pos-cart-panel">
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title">
+                    <i class="fa-solid fa-cart-shopping text-primary"></i> Current Cart Order
+                  </h3>
+                  <span class="badge badge-primary font-semibold" id="pos-cart-count">0 items</span>
+                </div>
+
+                <div class="card-body">
+                  <!-- Customer Selector Bar -->
+                  <div class="form-grid-2 mb-3">
+                    <div>
+                      <div class="flex justify-between items-center mb-1">
+                        <label class="form-label" style="margin-bottom: 0;">Patient / Customer</label>
+                        <button type="button" class="btn btn-sm btn-outline text-2xs" id="btn-pos-quick-add-cust">+ New Patient</button>
+                      </div>
+                      <select id="pos-customer-select" class="form-select"></select>
+                    </div>
+                    <div>
+                      <label class="form-label">Phone Number</label>
+                      <input type="text" id="pos-customer-phone" class="form-control" placeholder="+91 Customer Phone">
+                    </div>
+                  </div>
+
+                  <div class="form-group mb-3">
+                    <label class="form-label">Doctor / Prescriber Reference (Optional)</label>
+                    <input type="text" id="pos-doctor-ref" class="form-control" placeholder="e.g. Dr. K. S. Murthy, MD">
+                  </div>
+
+                  <!-- Cart Items Table -->
+                  <div class="pos-cart-table-wrapper">
+                    <table class="data-table">
+                      <thead>
+                        <tr>
+                          <th>Item</th>
+                          <th>Qty</th>
+                          <th class="text-right">Rate</th>
+                          <th class="text-right">Total</th>
+                          <th class="text-center" style="width: 30px;"></th>
+                        </tr>
+                      </thead>
+                      <tbody id="pos-cart-tbody"></tbody>
+                    </table>
+                  </div>
+
+                  <!-- Order Totals Box -->
+                  <div class="pos-totals-card">
+                    <div class="pos-total-row">
+                      <span>Items Subtotal:</span>
+                      <strong id="pos-subtotal">₹0.00</strong>
+                    </div>
+                    <div class="pos-total-row">
+                      <span>GST Tax (CGST + SGST):</span>
+                      <strong id="pos-tax-amount">₹0.00</strong>
+                    </div>
+                    <div class="pos-total-row">
+                      <span>Discount (₹):</span>
+                      <div class="flex items-center gap-2">
+                        <input type="number" id="pos-discount-input" class="form-control" style="width: 80px; padding: 0.2rem 0.4rem; height: 28px; font-size: 0.8rem;" placeholder="0.00" min="0">
+                        <strong class="text-success" id="pos-discount-display">-₹0.00</strong>
+                      </div>
+                    </div>
+                    <div class="pos-total-row pos-total-grand">
+                      <span>Grand Total:</span>
+                      <span id="pos-grand-total">₹0.00</span>
+                    </div>
+                  </div>
+
+                  <!-- Payment Method Selection -->
+                  <label class="form-label mb-1">Select Payment Method</label>
+                  <div class="pos-payment-radios">
+                    <label class="payment-radio-pill">
+                      <input type="radio" name="pos-payment-mode" value="Cash" checked>
+                      <i class="fa-solid fa-money-bill-wave text-success"></i> Cash
+                    </label>
+                    <label class="payment-radio-pill">
+                      <input type="radio" name="pos-payment-mode" value="UPI">
+                      <i class="fa-solid fa-qrcode text-primary"></i> UPI / QR
+                    </label>
+                    <label class="payment-radio-pill">
+                      <input type="radio" name="pos-payment-mode" value="Card">
+                      <i class="fa-solid fa-credit-card text-purple"></i> Card
+                    </label>
+                  </div>
+
+                  <!-- Cash Tender Group (Dynamic) -->
+                  <div id="pos-cash-details-group" class="mb-3">
+                    <div class="form-grid-2">
+                      <div>
+                        <label class="form-label">Cash Received (₹)</label>
+                        <input type="number" id="pos-cash-tendered" class="form-control" placeholder="Tendered Amount" min="0" step="1">
+                      </div>
+                      <div>
+                        <label class="form-label">Change to Return</label>
+                        <div id="pos-cash-change" class="form-control font-semibold" style="display: flex; align-items: center; background: var(--bg-surface-alt);">₹0.00</div>
+                      </div>
+                    </div>
+                  </div>
+
+                  <!-- Complete Checkout Button -->
+                  <button type="button" class="btn btn-primary btn-lg w-full" id="btn-pos-complete-sale">
+                    <i class="fa-solid fa-print"></i> Complete Sale & Generate Tax Bill
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 4. INVENTORY MANAGEMENT VIEW               -->
+        <!-- ========================================== -->
+        <section class="view-container" id="view-inventory">
+          <div class="view-header">
+            <div class="view-title-block">
+              <h1>Inventory Auditing & Stock Operations</h1>
+              <p>Monitor warehouse valuation, adjust balances, track expiry hazards, and place restock shipments</p>
+            </div>
+            <div class="view-actions-bar">
+              <button type="button" class="btn btn-outline" id="btn-export-inventory-csv">
+                <i class="fa-solid fa-file-csv"></i> Export Inventory Audit
+              </button>
+            </div>
+          </div>
+
+          <!-- Inventory Valuation KPIs -->
+          <div class="metrics-grid-5 mb-4" id="inv-kpi-grid">
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Total Stock Value</span>
+                <span class="metric-value text-primary" id="inv-metric-valuation">₹0</span>
+                <span class="metric-trend text-muted">Stock × Price</span>
+              </div>
+              <div class="metric-icon-box metric-icon-blue"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Total Items</span>
+                <span class="metric-value" id="inv-metric-units">0</span>
+                <span class="metric-trend text-muted" id="inv-metric-skus">0 Products</span>
+              </div>
+              <div class="metric-icon-box metric-icon-green"><i class="fa-solid fa-cubes"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Low-Stock Items</span>
+                <span class="metric-value text-warning" id="inv-metric-reorder">0</span>
+                <span class="metric-trend text-warning font-semibold">Under threshold</span>
+              </div>
+              <div class="metric-icon-box metric-icon-amber"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Out-of-Stock Items</span>
+                <span class="metric-value text-danger" id="inv-metric-critical">0</span>
+                <span class="metric-trend text-danger font-semibold">Zero balance</span>
+              </div>
+              <div class="metric-icon-box metric-icon-rose"><i class="fa-solid fa-circle-xmark"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Expiring Items</span>
+                <span class="metric-value text-danger" id="inv-metric-expiring">0</span>
+                <span class="metric-trend text-danger font-semibold">Soon / Expired</span>
+              </div>
+              <div class="metric-icon-box metric-icon-purple"><i class="fa-solid fa-clock-rotate-left"></i></div>
+            </div>
+          </div>
+
+          <!-- Inventory Filter Tabs & Search -->
+          <div class="card mb-4">
+            <div class="card-body flex justify-between items-center gap-4 flex-wrap">
+              <div class="filter-tabs-wrapper" id="inv-filter-tabs">
+                <button type="button" class="filter-tab-btn active" data-filter="all">All Items</button>
+                <button type="button" class="filter-tab-btn" data-filter="low-stock">Low Stock</button>
+                <button type="button" class="filter-tab-btn" data-filter="out-of-stock">Out of Stock</button>
+                <button type="button" class="filter-tab-btn" data-filter="expiring">Expiring Soon</button>
+                <button type="button" class="filter-tab-btn" data-filter="expired">Expired</button>
+              </div>
+
+              <div class="search-input-wrapper" style="max-width: 300px;">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="inv-search-input" class="global-search-input" placeholder="Search medicine, batch...">
+              </div>
+            </div>
+          </div>
+
+          <!-- Stock Table -->
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Medicine</th>
+                  <th>Batch</th>
+                  <th>Stock</th>
+                  <th>Minimum Stock</th>
+                  <th class="text-right">Price (₹)</th>
+                  <th class="text-right">Stock Value (₹)</th>
+                  <th>Expiry</th>
+                  <th>Status</th>
+                  <th class="text-center" style="width: 220px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="inventory-table-tbody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 5. PRESCRIPTIONS (Rx) VIEW                -->
+        <!-- ========================================== -->
+        <section class="view-container" id="view-prescriptions">
+          <div class="view-header">
+            <div class="view-title-block">
+              <h1>Prescriptions (Rx) Dispensing Queue</h1>
+              <p>Review doctor orders, verify digital slips, approve Schedule H drugs, and dispatch directly to POS</p>
+            </div>
+            <div class="view-actions-bar">
+              <button type="button" class="btn btn-primary" id="btn-new-prescription">
+                <i class="fa-solid fa-file-arrow-up"></i> Upload New Prescription
+              </button>
+            </div>
+          </div>
+
+          <!-- Rx Queue KPIs -->
+          <div class="metrics-grid-4 mb-4">
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Total Prescriptions</span>
+                <span class="metric-value" id="rx-metric-total">0</span>
+              </div>
+              <div class="metric-icon-box metric-icon-blue"><i class="fa-solid fa-file-medical"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Pending Review</span>
+                <span class="metric-value text-warning" id="rx-metric-pending">0</span>
+                <span class="metric-trend text-warning font-semibold">Requires pharmacist check</span>
+              </div>
+              <div class="metric-icon-box metric-icon-amber"><i class="fa-solid fa-clock-rotate-left"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Verified (Ready)</span>
+                <span class="metric-value text-primary" id="rx-metric-approved">0</span>
+                <span class="metric-trend text-primary font-semibold">Ready to dispense</span>
+              </div>
+              <div class="metric-icon-box metric-icon-purple"><i class="fa-solid fa-clipboard-check"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Dispensed Orders</span>
+                <span class="metric-value text-success" id="rx-metric-dispensed">0</span>
+              </div>
+              <div class="metric-icon-box metric-icon-green"><i class="fa-solid fa-circle-check"></i></div>
+            </div>
+          </div>
+
+          <!-- Filter & Search Controls -->
+          <div class="card mb-4">
+            <div class="card-body flex justify-between items-center gap-4 flex-wrap">
+              <div class="filter-tabs-wrapper" id="rx-filter-tabs">
+                <button type="button" class="filter-tab-btn active" data-filter="all">All Prescriptions</button>
+                <button type="button" class="filter-tab-btn" data-filter="pending">Pending</button>
+                <button type="button" class="filter-tab-btn" data-filter="verified">Verified</button>
+                <button type="button" class="filter-tab-btn" data-filter="rejected">Rejected</button>
+                <button type="button" class="filter-tab-btn" data-filter="dispensed">Dispensed</button>
+              </div>
+
+              <div class="search-input-wrapper" style="max-width: 300px;">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="rx-search-input" class="global-search-input" placeholder="Search patient, doctor, Rx ID...">
+              </div>
+            </div>
+          </div>
+
+          <!-- Prescriptions Table -->
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Prescription ID</th>
+                  <th>Patient</th>
+                  <th>Doctor</th>
+                  <th>Date</th>
+                  <th>Medicines</th>
+                  <th>Status</th>
+                  <th class="text-center" style="width: 220px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="prescriptions-table-tbody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 6. CUSTOMERS MANAGEMENT VIEW               -->
+        <!-- ========================================== -->
+        <section class="view-container" id="view-customers">
+          <div class="view-header">
+            <div class="view-title-block">
+              <h1>Customer & Patient Profiles</h1>
+              <p>Maintain patient records, chronic condition histories, contact registries, and lifetime billing values</p>
+            </div>
+            <div class="view-actions-bar">
+              <button type="button" class="btn btn-primary" id="btn-add-customer">
+                <i class="fa-solid fa-user-plus"></i> Add New Customer
+              </button>
+            </div>
+          </div>
+
+          <!-- Customer Metrics -->
+          <div class="metrics-grid-3 mb-4" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Registered Patients</span>
+                <span class="metric-value" id="cust-metric-total">0</span>
+              </div>
+              <div class="metric-icon-box metric-icon-blue"><i class="fa-solid fa-users"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Customer Lifetime Value</span>
+                <span class="metric-value text-primary" id="cust-metric-total-spent">₹0</span>
+              </div>
+              <div class="metric-icon-box metric-icon-green"><i class="fa-solid fa-wallet"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Average Spending / Patient</span>
+                <span class="metric-value" id="cust-metric-avg-spent">₹0.00</span>
+              </div>
+              <div class="metric-icon-box metric-icon-purple"><i class="fa-solid fa-chart-pie"></i></div>
+            </div>
+          </div>
+
+          <!-- Customer Search -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="cust-search-input" class="global-search-input" placeholder="Search patient name, phone number (+91), email...">
+              </div>
+            </div>
+          </div>
+
+          <!-- Customers Table -->
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Phone</th>
+                  <th>Email</th>
+                  <th>Date of Birth</th>
+                  <th>Address</th>
+                  <th class="text-center">Total Orders</th>
+                  <th class="text-right">Total Spending (₹)</th>
+                  <th>Last Purchase</th>
+                  <th class="text-center" style="width: 140px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="customers-table-tbody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 7. SUPPLIERS VIEW                          -->
+        <!-- ========================================== -->
+        <section class="view-container" id="view-suppliers">
+          <div class="view-header">
+            <div class="view-title-block">
+              <h1>Pharmaceutical Wholesalers & Suppliers</h1>
+              <p>Direct supply partners, pending purchase shipments, credit terms, and procurement orders</p>
+            </div>
+            <div class="view-actions-bar">
+              <button type="button" class="btn btn-outline" id="btn-create-po">
+                <i class="fa-solid fa-cart-flatbed"></i> New Purchase Order
+              </button>
+              <button type="button" class="btn btn-primary" id="btn-add-supplier">
+                <i class="fa-solid fa-plus"></i> Add Wholesaler
+              </button>
+            </div>
+          </div>
+
+          <!-- Supplier Metrics -->
+          <div class="metrics-grid-3 mb-4" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 1rem;">
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Authorized Wholesalers</span>
+                <span class="metric-value" id="sup-metric-total">0</span>
+              </div>
+              <div class="metric-icon-box metric-icon-blue"><i class="fa-solid fa-truck-field"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Pending Purchase Orders</span>
+                <span class="metric-value text-warning" id="sup-metric-pending-orders">0</span>
+              </div>
+              <div class="metric-icon-box metric-icon-amber"><i class="fa-solid fa-dolly"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Outstanding Vendor Balance</span>
+                <span class="metric-value text-danger" id="sup-metric-balance-due">₹0</span>
+              </div>
+              <div class="metric-icon-box metric-icon-rose"><i class="fa-solid fa-file-invoice-dollar"></i></div>
+            </div>
+          </div>
+
+          <!-- Search Suppliers -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="search-input-wrapper">
+                <i class="fa-solid fa-magnifying-glass"></i>
+                <input type="text" id="sup-search-input" class="global-search-input" placeholder="Search supplier company name, contact manager, phone, GSTIN...">
+              </div>
+            </div>
+          </div>
+
+          <!-- Suppliers Table -->
+          <div class="table-container">
+            <table class="data-table">
+              <thead>
+                <tr>
+                  <th>Vendor & Contact</th>
+                  <th>Phone & Email</th>
+                  <th>GSTIN / Terms</th>
+                  <th>Categories Supplied</th>
+                  <th class="text-center">Pending POs</th>
+                  <th class="text-right">Balance Due (₹)</th>
+                  <th class="text-center" style="width: 140px;">Actions</th>
+                </tr>
+              </thead>
+              <tbody id="suppliers-table-tbody"></tbody>
+            </table>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 8. ANALYTICS VIEW                         -->
+        <!-- ========================================== -->
+        <section class="view-container" id="view-analytics">
+          <div class="view-header">
+            <div class="view-title-block">
+              <h1>Pharmacy Analytics & Business Intelligence</h1>
+              <p>Revenue trends, order volumes, best-selling medicines, therapeutic categories, and inventory health</p>
+            </div>
+            <div class="view-actions-bar">
+              <div class="filter-tabs-wrapper" id="analytics-timeframe-tabs">
+                <button type="button" class="filter-tab-btn active analytics-timeframe-btn" data-timeframe="7d">7 Days</button>
+                <button type="button" class="filter-tab-btn analytics-timeframe-btn" data-timeframe="30d">30 Days</button>
+                <button type="button" class="filter-tab-btn analytics-timeframe-btn" data-timeframe="3m">3 Months</button>
+                <button type="button" class="filter-tab-btn analytics-timeframe-btn" data-timeframe="1y">1 Year</button>
+              </div>
+              <button type="button" class="btn btn-outline" id="btn-export-analytics">
+                <i class="fa-solid fa-download"></i> Export JSON Report
+              </button>
+            </div>
+          </div>
+
+          <!-- Financial & Operational Performance KPIs -->
+          <div class="metrics-grid-5 mb-4">
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Revenue Overview</span>
+                <span class="metric-value text-primary" id="analytics-total-revenue">₹0.00</span>
+                <span class="metric-trend text-muted" id="analytics-timeframe-label">Selected Period</span>
+              </div>
+              <div class="metric-icon-box metric-icon-blue"><i class="fa-solid fa-indian-rupee-sign"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Daily Sales (Avg)</span>
+                <span class="metric-value text-success" id="analytics-daily-sales">₹0.00</span>
+                <span class="metric-trend text-muted">Per day average</span>
+              </div>
+              <div class="metric-icon-box metric-icon-green"><i class="fa-solid fa-calendar-day"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Weekly Sales</span>
+                <span class="metric-value text-purple" id="analytics-weekly-sales">₹0.00</span>
+                <span class="metric-trend text-muted">Last 7d volume</span>
+              </div>
+              <div class="metric-icon-box metric-icon-purple"><i class="fa-solid fa-calendar-week"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Monthly Sales</span>
+                <span class="metric-value text-primary" id="analytics-monthly-sales">₹0.00</span>
+                <span class="metric-trend text-muted">Last 30d volume</span>
+              </div>
+              <div class="metric-icon-box metric-icon-blue"><i class="fa-solid fa-calendar-days"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Number of Orders</span>
+                <span class="metric-value" id="analytics-total-orders">0</span>
+                <span class="metric-trend text-muted" id="analytics-aov-sub">AOV: ₹0.00</span>
+              </div>
+              <div class="metric-icon-box metric-icon-amber"><i class="fa-solid fa-receipt"></i></div>
+            </div>
+          </div>
+
+          <!-- Inventory Health KPIs Row -->
+          <div class="metrics-grid-3 mb-4">
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Inventory Value</span>
+                <span class="metric-value text-primary" id="analytics-inv-val">₹0.00</span>
+                <span class="metric-trend text-muted" id="analytics-inv-units">0 total units</span>
+              </div>
+              <div class="metric-icon-box metric-icon-blue"><i class="fa-solid fa-boxes-stacked"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Low-Stock Percentage</span>
+                <span class="metric-value text-warning" id="analytics-low-stock-pct">0%</span>
+                <span class="metric-trend text-warning font-semibold" id="analytics-low-stock-items">0 items below threshold</span>
+              </div>
+              <div class="metric-icon-box metric-icon-amber"><i class="fa-solid fa-triangle-exclamation"></i></div>
+            </div>
+            <div class="metric-card">
+              <div class="metric-info">
+                <span class="metric-title">Expired Inventory</span>
+                <span class="metric-value text-danger" id="analytics-expired-val">₹0.00</span>
+                <span class="metric-trend text-danger font-semibold" id="analytics-expired-count">0 expired batches</span>
+              </div>
+              <div class="metric-icon-box metric-icon-rose"><i class="fa-solid fa-radiation"></i></div>
+            </div>
+          </div>
+
+          <!-- Main Analytics Charts: Revenue Chart & Orders Chart -->
+          <div class="dashboard-grid-main mb-4">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fa-solid fa-chart-line text-primary"></i> Revenue Overview Trend</h3>
+                <span class="text-xs text-muted" id="analytics-rev-chart-sub">Gross Sales (₹)</span>
+              </div>
+              <div class="card-body">
+                <div class="chart-card-container">
+                  <canvas id="chart-analytics-revenue"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fa-solid fa-chart-simple text-success"></i> Orders Volume Trend</h3>
+                <span class="text-xs text-muted" id="analytics-orders-chart-sub">Invoices Dispensed</span>
+              </div>
+              <div class="card-body">
+                <div class="chart-card-container">
+                  <canvas id="chart-analytics-orders"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Category Breakdown & Top Medicines Ranking -->
+          <div class="dashboard-grid-main mb-4">
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fa-solid fa-chart-pie text-purple"></i> Sales by Medicine Category</h3>
+                <span class="text-xs text-muted">Therapeutic Distribution</span>
+              </div>
+              <div class="card-body">
+                <div class="chart-card-container">
+                  <canvas id="chart-analytics-category"></canvas>
+                </div>
+              </div>
+            </div>
+
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fa-solid fa-ranking-star text-warning"></i> Best-Selling Medicines Ranking</h3>
+                <span class="text-xs text-muted">Top Products by Units Sold</span>
+              </div>
+              <div class="card-body" style="padding: 0;">
+                <div class="table-container" style="border: none;">
+                  <table class="data-table">
+                    <thead>
+                      <tr>
+                        <th style="width: 50px;">Rank</th>
+                        <th>Medicine</th>
+                        <th class="text-center">Units Sold</th>
+                        <th class="text-right">Revenue (₹)</th>
+                        <th class="text-center">Stock Status</th>
+                      </tr>
+                    </thead>
+                    <tbody id="analytics-bestsellers-tbody"></tbody>
+                  </table>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Inventory Health Visual Indicator Card -->
+          <div class="card mb-4">
+            <div class="card-header">
+              <h3 class="card-title"><i class="fa-solid fa-heart-pulse text-primary"></i> Inventory Health Indicator & Stock Audit</h3>
+              <span class="badge badge-success" id="analytics-health-badge"><i class="fa-solid fa-shield-halved"></i> Optimal Stock</span>
+            </div>
+            <div class="card-body">
+              <div class="grid grid-cols-3 gap-4" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem;">
+                <!-- Health Progress Bar -->
+                <div>
+                  <div class="flex justify-between text-xs font-semibold mb-1">
+                    <span>Overall Stock Sufficiency</span>
+                    <span id="analytics-health-score">92%</span>
+                  </div>
+                  <div style="width: 100%; height: 10px; background: var(--bg-surface-alt); border-radius: var(--radius-full); overflow: hidden;">
+                    <div id="analytics-health-bar" style="width: 92%; height: 100%; background: var(--color-success); border-radius: var(--radius-full); transition: width 0.4s ease;"></div>
+                  </div>
+                  <p class="text-2xs text-muted mt-2" id="analytics-health-desc">
+                    Most pharmacy catalogue items maintain healthy warehouse balances above threshold.
+                  </p>
+                </div>
+
+                <!-- Stock Segment Breakdown -->
+                <div>
+                  <div class="text-xs font-bold text-main mb-2">Catalogue Health Breakdown</div>
+                  <div class="flex flex-col gap-1 text-xs">
+                    <div class="flex justify-between">
+                      <span class="text-success"><i class="fa-solid fa-circle-check"></i> Sufficient Stock:</span>
+                      <strong id="analytics-count-sufficient">0 SKUs</strong>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-warning"><i class="fa-solid fa-triangle-exclamation"></i> Low Stock Alert:</span>
+                      <strong id="analytics-count-low">0 SKUs</strong>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-danger"><i class="fa-solid fa-circle-xmark"></i> Out of Stock:</span>
+                      <strong id="analytics-count-oos">0 SKUs</strong>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- Expiry Quarantine Alert -->
+                <div>
+                  <div class="text-xs font-bold text-main mb-2">Expiry Hazard Monitoring</div>
+                  <div class="flex flex-col gap-1 text-xs">
+                    <div class="flex justify-between">
+                      <span class="text-warning"><i class="fa-solid fa-clock"></i> Expiring Soon (&lt;60d):</span>
+                      <strong id="analytics-count-near-exp">0 Batches</strong>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-danger"><i class="fa-solid fa-radiation"></i> Already Expired:</span>
+                      <strong id="analytics-count-expired">0 Batches</strong>
+                    </div>
+                    <div class="flex justify-between">
+                      <span class="text-primary"><i class="fa-solid fa-vault"></i> Safe Shelf-Life:</span>
+                      <strong id="analytics-count-safe">0 Batches</strong>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 9. ALERTS CENTER VIEW                      -->
+        <!-- ========================================== -->
+        <section class="view-container" id="view-alerts">
+          <div class="view-header">
+            <div class="view-title-block">
+              <h1>Pharmacy Alerts & Safety Monitoring</h1>
+              <p>Triage inventory shortages, quarantine expired drugs, and manage pending wholesaler shipments</p>
+            </div>
+            <div class="view-actions-bar">
+              <button type="button" class="btn btn-outline" id="btn-dismiss-all-alerts">
+                <i class="fa-solid fa-check-double"></i> Dismiss All in View
+              </button>
+            </div>
+          </div>
+
+          <!-- Filter Pills with Live Counter Badges -->
+          <div class="card mb-4">
+            <div class="card-body">
+              <div class="filter-tabs-wrapper" id="alerts-filter-tabs">
+                <button type="button" class="filter-tab-btn active" data-filter="all">
+                  All Alerts (<span id="alerts-count-all">0</span>)
+                </button>
+                <button type="button" class="filter-tab-btn" data-filter="critical" style="color: var(--color-danger);">
+                  <i class="fa-solid fa-circle-exclamation"></i> Critical (<span id="alerts-count-critical">0</span>)
+                </button>
+                <button type="button" class="filter-tab-btn" data-filter="warning" style="color: var(--color-warning);">
+                  <i class="fa-solid fa-triangle-exclamation"></i> Warning (<span id="alerts-count-warning">0</span>)
+                </button>
+                <button type="button" class="filter-tab-btn" data-filter="info" style="color: var(--color-primary);">
+                  <i class="fa-solid fa-circle-info"></i> Information (<span id="alerts-count-info">0</span>)
+                </button>
+                <button type="button" class="filter-tab-btn" data-filter="success" style="color: var(--color-success);">
+                  <i class="fa-solid fa-circle-check"></i> Success (<span id="alerts-count-success">0</span>)
+                </button>
+                <button type="button" class="filter-tab-btn" data-filter="low-stock">
+                  Low Stock (<span id="alerts-count-low">0</span>)
+                </button>
+                <button type="button" class="filter-tab-btn" data-filter="expiry">
+                  Expiry (<span id="alerts-count-exp">0</span>)
+                </button>
+                <button type="button" class="filter-tab-btn" data-filter="prescriptions">
+                  Pending Rx (<span id="alerts-count-rx">0</span>)
+                </button>
+                <button type="button" class="filter-tab-btn" data-filter="suppliers">
+                  Supplier POs (<span id="alerts-count-sup">0</span>)
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Alerts List Container -->
+          <div class="alerts-list-wrapper" id="alerts-list-container"></div>
+        </section>
+
+        <!-- ========================================== -->
+        <!-- 10. SETTINGS VIEW                         -->
+        <!-- ========================================== -->
+        <section class="view-container" id="view-settings">
+          <div class="view-header">
+            <div class="view-title-block">
+              <h1>System Configuration & Store Profile</h1>
+              <p>Configure tax parameters, drug licensing credentials, low-stock alerts, and database backups</p>
+            </div>
+          </div>
+
+          <div class="dashboard-grid-main">
+            <!-- Left: Settings Form -->
+            <div class="card">
+              <div class="card-header">
+                <h3 class="card-title"><i class="fa-solid fa-sliders text-primary"></i> Pharmacy Profile & Regulatory Details</h3>
+              </div>
+              <div class="card-body">
+                <form id="form-settings-general">
+                  <div class="form-grid-2">
+                    <div class="form-group">
+                      <label class="form-label">Pharmacy Trade Name</label>
+                      <input type="text" id="set-pharmacy-name" class="form-control" required>
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Brand Tagline</label>
+                      <input type="text" id="set-tagline" class="form-control">
+                    </div>
+                  </div>
+
+                  <div class="form-group">
+                    <label class="form-label">Registered Premises Address</label>
+                    <textarea id="set-address" class="form-textarea" rows="2"></textarea>
+                  </div>
+
+                  <div class="form-grid-2">
+                    <div class="form-group">
+                      <label class="form-label">Contact Phone</label>
+                      <input type="text" id="set-phone" class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Official Email</label>
+                      <input type="email" id="set-email" class="form-control">
+                    </div>
+                  </div>
+
+                  <div class="form-grid-2">
+                    <div class="form-group">
+                      <label class="form-label">Drug License (DL) Number</label>
+                      <input type="text" id="set-dl-number" class="form-control">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">GSTIN / Tax Registration</label>
+                      <input type="text" id="set-gstin" class="form-control">
+                    </div>
+                  </div>
+
+                  <hr style="border: none; border-top: 1px solid var(--border-color); margin: 1rem 0;">
+
+                  <h4 class="font-semibold mb-3"><i class="fa-solid fa-calculator text-primary"></i> Tax & Alert Rules</h4>
+                  <div class="form-grid-3">
+                    <div class="form-group">
+                      <label class="form-label">Default GST Rate (%)</label>
+                      <input type="number" id="set-default-gst" class="form-control" min="0" max="28" step="1">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Low Stock Threshold (Units)</label>
+                      <input type="number" id="set-low-threshold" class="form-control" min="1" max="100">
+                    </div>
+                    <div class="form-group">
+                      <label class="form-label">Expiry Alert Horizon (Days)</label>
+                      <input type="number" id="set-expiry-days" class="form-control" min="7" max="180">
+                    </div>
+                  </div>
+
+                  <div class="flex gap-4 mt-3 mb-4">
+                    <label class="form-checkbox-label">
+                      <input type="checkbox" id="set-sound-toggle" checked>
+                      <span>Enable Notification Sounds</span>
+                    </label>
+                    <label class="form-checkbox-label">
+                      <input type="checkbox" id="set-theme-toggle">
+                      <span>Enable Dark Mode UI</span>
+                    </label>
+                  </div>
+
+                  <button type="submit" class="btn btn-primary">
+                    <i class="fa-solid fa-floppy-disk"></i> Save Configuration
+                  </button>
+                </form>
+              </div>
+            </div>
+
+            <!-- Right: Backup & Data Reset Section (Critical for Demo) -->
+            <div class="flex flex-col gap-4">
+              <!-- Backup & Restore -->
+              <div class="card">
+                <div class="card-header">
+                  <h3 class="card-title"><i class="fa-solid fa-database text-primary"></i> Data Backup & Restore</h3>
+                </div>
+                <div class="card-body flex flex-col gap-3">
+                  <p class="text-sm text-muted">Export entire local database as a clean JSON backup file, or restore existing datasets seamlessly.</p>
+                  
+                  <button type="button" class="btn btn-outline" id="btn-export-backup-json">
+                    <i class="fa-solid fa-file-arrow-down"></i> Export Full Backup (JSON)
+                  </button>
+
+                  <div class="form-group" style="margin-bottom: 0;">
+                    <label class="form-label">Restore from JSON Backup File</label>
+                    <input type="file" id="input-import-backup-file" class="form-control" accept=".json">
+                  </div>
+                </div>
+              </div>
+
+              <!-- Factory Reset Card -->
+              <div class="card" style="border-color: rgba(239, 68, 68, 0.3);">
+                <div class="card-header" style="background-color: var(--color-danger-light);">
+                  <h3 class="card-title text-danger"><i class="fa-solid fa-triangle-exclamation"></i> Reset Demo Dataset</h3>
+                </div>
+                <div class="card-body flex flex-col gap-3">
+                  <p class="text-sm text-secondary">
+                    Instantly purge modified test items and restore the rich Indian pharmacy seed data (20+ medicines, registered customers, suppliers, and prescriptions).
+                  </p>
+                  <button type="button" class="btn btn-danger" id="btn-reset-demo-data">
+                    <i class="fa-solid fa-arrow-rotate-left"></i> Reset to Factory Demo Data
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <!-- ========================================================================= -->
+  <!-- MODAL DIALOGS                                                             -->
+  <!-- ========================================================================= -->
+
+  <!-- 1. Add / Edit Medicine Modal -->
+  <div class="modal-overlay" id="modal-medicine-form" aria-hidden="true">
+    <div class="modal-container modal-lg">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-medicine-title">Add New Medicine</h3>
+        <button type="button" class="modal-close-btn" data-modal-close aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-medicine-edit">
+          <input type="hidden" id="med-input-id">
+          
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Trade / Brand Name *</label>
+              <input type="text" id="med-input-name" class="form-control" placeholder="e.g. Dolo 650" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Generic Active Chemical Formula</label>
+              <input type="text" id="med-input-generic" class="form-control" placeholder="e.g. Paracetamol 650mg">
+            </div>
+          </div>
+
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label class="form-label">Therapeutic Category</label>
+              <select id="med-input-category" class="form-select"></select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Batch Code *</label>
+              <input type="text" id="med-input-batch" class="form-control" placeholder="e.g. DL-24B01" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Rack / Shelf Location</label>
+              <input type="text" id="med-input-rack" class="form-control" placeholder="e.g. Rack A-01">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Manufacturing Date</label>
+              <input type="date" id="med-input-mfg" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Expiry Date *</label>
+              <input type="date" id="med-input-expiry" class="form-control" required>
+            </div>
+          </div>
+
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label class="form-label">Purchase / Cost Price (₹)</label>
+              <input type="number" id="med-input-purchase-price" class="form-control" step="0.01" min="0" placeholder="0.00">
+            </div>
+            <div class="form-group">
+              <label class="form-label">MRP / Retail Price (₹) *</label>
+              <input type="number" id="med-input-price" class="form-control" step="0.01" min="0" placeholder="0.00" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">GST Tax (%)</label>
+              <input type="number" id="med-input-gst" class="form-control" value="12" min="0" max="28">
+            </div>
+          </div>
+
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label class="form-label">Initial Stock Units</label>
+              <input type="number" id="med-input-stock" class="form-control" min="0" value="50">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Minimum Reorder Level</label>
+              <input type="number" id="med-input-minstock" class="form-control" min="1" value="15">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Primary Wholesaler</label>
+              <select id="med-input-supplier" class="form-select"></select>
+            </div>
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-checkbox-label">
+              <input type="checkbox" id="med-input-rx">
+              <span>Prescription Required (Schedule H/X Drug)</span>
+            </label>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Clinical Indication & Notes</label>
+            <textarea id="med-input-desc" class="form-textarea" placeholder="Dosage notes, contraindications..."></textarea>
+          </div>
+
+          <div class="modal-actions-bar mt-4">
+            <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save Medicine</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 2. Medicine Details Monograph Modal -->
+  <div class="modal-overlay" id="modal-medicine-details" aria-hidden="true">
+    <div class="modal-container modal-lg">
+      <div class="modal-header">
+        <h3 class="modal-title">Medicine Monograph & Batch Details</h3>
+        <button type="button" class="modal-close-btn" data-modal-close aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body" id="med-details-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- 3. Stock Adjustment Modal -->
+  <div class="modal-overlay" id="modal-stock-adjustment" aria-hidden="true">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">Audit Stock Adjustment</h3>
+        <button type="button" class="modal-close-btn" data-modal-close aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-stock-adjustment">
+          <input type="hidden" id="adjust-med-id">
+          <div class="form-group">
+            <label class="form-label">Selected Medicine</label>
+            <div class="font-bold text-primary" id="adjust-med-name">—</div>
+            <div class="text-xs text-muted">Current Physical Balance: <span id="adjust-current-stock" class="font-semibold">—</span></div>
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label">Adjustment Type</label>
+            <div class="grid grid-cols-2 gap-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 0.5rem;">
+              <button type="button" class="btn btn-outline active" id="btn-adjust-type-add" style="border-color: var(--color-success); color: var(--color-success);">
+                <i class="fa-solid fa-plus"></i> Add Stock (+)
+              </button>
+              <button type="button" class="btn btn-outline" id="btn-adjust-type-sub" style="border-color: var(--color-danger); color: var(--color-danger);">
+                <i class="fa-solid fa-minus"></i> Remove Stock (-)
+              </button>
+            </div>
+            <input type="hidden" id="adjust-operation-mode" value="add">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" id="adjust-qty-label">Quantity to Add (Units) *</label>
+            <input type="number" id="adjust-delta-qty" class="form-control" placeholder="e.g. 10" min="1" required>
+            <span class="text-2xs text-muted" id="adjust-qty-hint">Quantity will be added to physical balance.</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Reason for Discrepancy</label>
+            <select id="adjust-reason" class="form-select">
+              <option value="Physical Audit Discrepancy">Physical Audit Discrepancy</option>
+              <option value="Damaged / Broken Strip">Damaged / Broken Strip</option>
+              <option value="Quarantine Expired Drug">Quarantine Expired Drug</option>
+              <option value="Customer Return">Customer Return</option>
+              <option value="Supplier Batch Correction">Supplier Batch Correction</option>
+            </select>
+          </div>
+
+          <div class="modal-actions-bar mt-4">
+            <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
+            <button type="submit" class="btn btn-primary" id="btn-submit-adjust"><i class="fa-solid fa-check"></i> Apply Adjustment</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 4. Quick Restock Modal -->
+  <div class="modal-overlay" id="modal-stock-restock" aria-hidden="true">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title">Replenish Stock Batch</h3>
+        <button type="button" class="modal-close-btn" data-modal-close aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-stock-restock">
+          <input type="hidden" id="restock-med-id">
+          <div class="form-group">
+            <label class="form-label">Medicine</label>
+            <div class="font-bold text-primary" id="restock-med-name">—</div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Quantity to Add (Units) *</label>
+              <input type="number" id="restock-qty" class="form-control" value="50" min="1" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Purchase Unit Cost (₹)</label>
+              <input type="number" id="restock-cost" class="form-control" step="0.01" min="0">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Supplying Wholesaler</label>
+            <select id="restock-supplier-select" class="form-select"></select>
+          </div>
+
+          <div class="modal-actions-bar mt-4">
+            <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-truck-ramp-box"></i> Confirm Restock</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 5. Prescriptions Upload Modal -->
+  <div class="modal-overlay" id="modal-prescription-upload" aria-hidden="true">
+    <div class="modal-container modal-lg">
+      <div class="modal-header">
+        <h3 class="modal-title">Upload Clinical Prescription</h3>
+        <button type="button" class="modal-close-btn" data-modal-close aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-prescription-upload">
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Patient Name *</label>
+              <input type="text" id="rx-input-patient-name" class="form-control" placeholder="e.g. Tanvi Deshmukh" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Patient Phone</label>
+              <input type="text" id="rx-input-patient-phone" class="form-control" placeholder="+91 98765 43210">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Doctor Name *</label>
+              <input type="text" id="rx-input-doctor-name" class="form-control" placeholder="e.g. Dr. Sandeep Hegde, MS (ENT)" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Hospital / Clinic</label>
+              <input type="text" id="rx-input-hospital" class="form-control" placeholder="e.g. Aster CMI Hospital">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Clinical Diagnosis</label>
+            <input type="text" id="rx-input-diagnosis" class="form-control" placeholder="e.g. Acute Pharyngitis & Bronchial Spasm">
+          </div>
+
+          <!-- Add Prescribed Drugs Section -->
+          <div class="card mb-3" style="background-color: var(--bg-surface-alt);">
+            <div class="card-body">
+              <div class="font-semibold text-sm mb-2"><i class="fa-solid fa-pills text-primary"></i> Add Prescribed Medications</div>
+              <div class="form-grid-3 mb-2">
+                <div>
+                  <select id="rx-input-med-select" class="form-select"></select>
+                </div>
+                <div>
+                  <input type="number" id="rx-input-med-qty" class="form-control" placeholder="Qty (e.g. 10)" value="10" min="1">
+                </div>
+                <div>
+                  <input type="text" id="rx-input-med-dosage" class="form-control" placeholder="Dosage: 1 tab BD after food">
+                </div>
+              </div>
+              <button type="button" class="btn btn-sm btn-secondary" id="btn-rx-add-draft-item">
+                <i class="fa-solid fa-plus"></i> Add Item to Rx
+              </button>
+              
+              <div id="rx-draft-items-container" class="mt-3"></div>
+            </div>
+          </div>
+
+          <!-- Simulated Upload Prescription Document Area -->
+          <div class="form-group mb-3">
+            <label class="form-label">Digital Prescription Slip (Image / PDF)</label>
+            <div class="file-dropzone" id="rx-file-dropzone" style="border: 2px dashed var(--border-color); border-radius: var(--radius-md); padding: 1.5rem; text-align: center; cursor: pointer; background: var(--bg-surface-alt); transition: all var(--transition-fast);">
+              <input type="file" id="rx-input-file" accept="image/*,.pdf" style="display: none;">
+              <div id="rx-dropzone-content">
+                <i class="fa-solid fa-cloud-arrow-up fa-2x text-primary mb-2" style="display: block;"></i>
+                <div class="font-medium text-sm">Click to select prescription file or drag & drop</div>
+                <div class="text-xs text-muted mt-1">Supports PNG, JPG, WebP, or PDF (Simulated pharmacist preview)</div>
+              </div>
+              <div id="rx-dropzone-preview" style="display: none; align-items: center; justify-content: center; gap: 0.75rem;">
+                <i class="fa-solid fa-file-circle-check fa-2x text-success"></i>
+                <div class="text-left">
+                  <div class="font-semibold text-sm" id="rx-preview-filename">prescription_scan.pdf</div>
+                  <div class="text-xs text-muted" id="rx-preview-filesize">Document attached (Ready)</div>
+                </div>
+                <button type="button" class="btn btn-sm btn-outline text-danger ml-2" id="btn-rx-clear-file" style="margin-left: 0.5rem;">
+                  <i class="fa-solid fa-trash-can"></i> Remove
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Physician Notes / Instructions</label>
+            <textarea id="rx-input-notes" class="form-textarea" placeholder="Special doctor instructions or warnings..."></textarea>
+          </div>
+
+          <div class="modal-actions-bar mt-4">
+            <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-cloud-arrow-up"></i> Submit Prescription</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 6. Prescription Details & Review Modal -->
+  <div class="modal-overlay" id="modal-prescription-details" aria-hidden="true">
+    <div class="modal-container modal-lg">
+      <div class="modal-header">
+        <h3 class="modal-title">Clinical Prescription Review</h3>
+        <button type="button" class="modal-close-btn" data-modal-close aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body" id="rx-details-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- 6B. Prescription Rejection Reason Modal -->
+  <div class="modal-overlay" id="modal-prescription-reject" aria-hidden="true">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title text-danger"><i class="fa-solid fa-ban"></i> Reject Prescription</h3>
+        <button type="button" class="modal-close-btn" data-modal-close aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-prescription-reject">
+          <input type="hidden" id="rx-reject-id">
+          <div class="form-group mb-3">
+            <label class="form-label">Prescription under review</label>
+            <div class="font-bold text-primary" id="rx-reject-summary">—</div>
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label">Select Standard Pharmacist Rejection Reason *</label>
+            <select id="rx-reject-reason-select" class="form-select">
+              <option value="Physician signature or medical council reg number missing">Physician signature or medical council reg number missing</option>
+              <option value="Prescription expired (validity exceeded for Schedule H drug)">Prescription expired (validity exceeded for Schedule H drug)</option>
+              <option value="Illegible doctor handwriting / unclear chemical dosage">Illegible doctor handwriting / unclear chemical dosage</option>
+              <option value="Contraindication or severe drug-drug interaction hazard">Contraindication or severe drug-drug interaction hazard</option>
+              <option value="Duplicate or already dispensed slip">Duplicate or already dispensed slip</option>
+              <option value="Custom">Other (Specify below)</option>
+            </select>
+          </div>
+
+          <div class="form-group mb-3">
+            <label class="form-label">Pharmacist Clinical Notes / Justification</label>
+            <textarea id="rx-reject-reason-notes" class="form-textarea" placeholder="Provide detailed explanation for clinical audit log..."></textarea>
+          </div>
+
+          <div class="modal-actions-bar mt-4">
+            <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
+            <button type="submit" class="btn btn-danger"><i class="fa-solid fa-xmark"></i> Confirm Rejection</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 7. Customer Add/Edit Modal -->
+  <div class="modal-overlay" id="modal-customer-form" aria-hidden="true">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-customer-title">Add Patient / Customer</h3>
+        <button type="button" class="modal-close-btn" data-modal-close aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-customer-edit">
+          <input type="hidden" id="cust-input-id">
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label class="form-label">Full Name *</label>
+              <input type="text" id="cust-input-name" class="form-control" placeholder="e.g. Rajesh Sharma" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number *</label>
+              <input type="text" id="cust-input-phone" class="form-control" placeholder="+91 98765 43210" required>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Email Address</label>
+              <input type="email" id="cust-input-email" class="form-control" placeholder="name@email.com">
+            </div>
+          </div>
+
+          <div class="form-grid-3">
+            <div class="form-group">
+              <label class="form-label">Date of Birth</label>
+              <input type="date" id="cust-input-dob" class="form-control">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Gender</label>
+              <select id="cust-input-gender" class="form-select">
+                <option value="Male">Male</option>
+                <option value="Female">Female</option>
+                <option value="Other">Other</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Blood Group</label>
+              <select id="cust-input-blood" class="form-select">
+                <option value="A+">A+</option>
+                <option value="A-">A-</option>
+                <option value="B+">B+</option>
+                <option value="B-">B-</option>
+                <option value="O+">O+</option>
+                <option value="O-">O-</option>
+                <option value="AB+">AB+</option>
+                <option value="AB-">AB-</option>
+              </select>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Residential Address</label>
+            <textarea id="cust-input-address" class="form-textarea" placeholder="Flat, Street, Locality..."></textarea>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Medical History / Chronic Conditions / Allergies</label>
+            <textarea id="cust-input-notes" class="form-textarea" placeholder="e.g. Type 2 Diabetic, Allergic to Penicillin..."></textarea>
+          </div>
+
+          <div class="modal-actions-bar mt-4">
+            <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save Customer</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 8. Customer Profile Modal -->
+  <div class="modal-overlay" id="modal-customer-profile" aria-hidden="true">
+    <div class="modal-container modal-lg">
+      <div class="modal-header">
+        <h3 class="modal-title">Patient Profile & Purchase Log</h3>
+        <button type="button" class="modal-close-btn" data-modal-close aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body" id="cust-profile-modal-body"></div>
+    </div>
+  </div>
+
+  <!-- 9. Supplier Form Modal -->
+  <div class="modal-overlay" id="modal-supplier-form" aria-hidden="true">
+    <div class="modal-container">
+      <div class="modal-header">
+        <h3 class="modal-title" id="modal-supplier-title">Add Wholesaler</h3>
+        <button type="button" class="modal-close-btn" data-modal-close aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-supplier-edit">
+          <input type="hidden" id="sup-input-id">
+          <div class="form-group">
+            <label class="form-label">Company / Agency Name *</label>
+            <input type="text" id="sup-input-name" class="form-control" placeholder="e.g. Sun Pharma Central Depot" required>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Contact Person</label>
+              <input type="text" id="sup-input-contact" class="form-control" placeholder="Manager Name">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Phone Number *</label>
+              <input type="text" id="sup-input-phone" class="form-control" placeholder="+91 Phone" required>
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" id="sup-input-email" class="form-control" placeholder="orders@supplier.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">GSTIN</label>
+              <input type="text" id="sup-input-gstin" class="form-control" placeholder="29AAACS8899P1ZL">
+            </div>
+          </div>
+
+          <div class="form-grid-2">
+            <div class="form-group">
+              <label class="form-label">Payment Terms</label>
+              <select id="sup-input-terms" class="form-select">
+                <option value="Net 30 Days">Net 30 Days</option>
+                <option value="Net 15 Days">Net 15 Days</option>
+                <option value="Cash on Delivery">Cash on Delivery</option>
+                <option value="Advance">Advance Payment</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Lead Time (Days)</label>
+              <input type="number" id="sup-input-lead" class="form-control" value="2" min="1">
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Warehouse Address</label>
+            <textarea id="sup-input-address" class="form-textarea" placeholder="Warehouse address..."></textarea>
+          </div>
+
+          <div class="modal-actions-bar mt-4">
+            <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-floppy-disk"></i> Save Supplier</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10. Purchase Order (PO) Modal -->
+  <div class="modal-overlay" id="modal-purchase-order" aria-hidden="true">
+    <div class="modal-container modal-lg">
+      <div class="modal-header">
+        <h3 class="modal-title">Create Wholesaler Purchase Order</h3>
+        <button type="button" class="modal-close-btn" data-modal-close aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body">
+        <form id="form-purchase-order">
+          <div class="form-group">
+            <label class="form-label">Target Wholesaler *</label>
+            <select id="po-supplier-select" class="form-select" required></select>
+          </div>
+
+          <div class="card mb-3" style="background-color: var(--bg-surface-alt);">
+            <div class="card-body">
+              <div class="font-semibold text-sm mb-2"><i class="fa-solid fa-box-open text-primary"></i> Add Items to PO</div>
+              <div class="form-grid-3 mb-2">
+                <div>
+                  <select id="po-med-select" class="form-select"></select>
+                </div>
+                <div>
+                  <input type="number" id="po-med-qty" class="form-control" placeholder="Qty" value="50" min="1">
+                </div>
+                <div>
+                  <input type="number" id="po-med-unit-cost" class="form-control" placeholder="Unit Cost (₹)" step="0.01">
+                </div>
+              </div>
+              <button type="button" class="btn btn-sm btn-secondary" id="btn-po-add-draft-item">
+                <i class="fa-solid fa-plus"></i> Add Item
+              </button>
+
+              <div id="po-draft-items-list" class="mt-3"></div>
+            </div>
+          </div>
+
+          <div class="flex justify-between items-center mb-3">
+            <span class="font-semibold">Estimated PO Value:</span>
+            <span class="font-bold text-primary text-lg" id="po-estimated-total">₹0.00</span>
+          </div>
+
+          <div class="modal-actions-bar mt-4">
+            <button type="button" class="btn btn-outline" data-modal-close>Cancel</button>
+            <button type="submit" class="btn btn-primary"><i class="fa-solid fa-paper-plane"></i> Dispatch Purchase Order</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11. Printable Tax Invoice Modal -->
+  <div class="modal-overlay" id="modal-invoice" aria-hidden="true">
+    <div class="modal-container modal-lg">
+      <div class="modal-header no-print">
+        <h3 class="modal-title"><i class="fa-solid fa-file-invoice text-primary"></i> Retail Tax Invoice</h3>
+        <button type="button" class="modal-close-btn" data-modal-close aria-label="Close modal">&times;</button>
+      </div>
+      <div class="modal-body" id="invoice-modal-content"></div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Root Container -->
+  <div class="toast-container" id="toast-container"></div>
+
+  <!-- ========================================================================= -->
+  <!-- APPLICATION SCRIPTS (Modular Vanilla Architecture)                        -->
+  <!-- ========================================================================= -->
+  <script src="js/data/seed-data.js"></script>
+  <script src="js/data/storage.js"></script>
+  <script src="js/components/toast.js"></script>
+  <script src="js/components/modal.js"></script>
+  <script src="js/modules/auth.js"></script>
+  <script src="js/modules/dashboard.js"></script>
+  <script src="js/modules/medicines.js"></script>
+  <script src="js/modules/pos.js"></script>
+  <script src="js/modules/inventory.js"></script>
+  <script src="js/modules/prescriptions.js"></script>
+  <script src="js/modules/customers.js"></script>
+  <script src="js/modules/suppliers.js"></script>
+  <script src="js/modules/analytics.js"></script>
+  <script src="js/modules/alerts.js"></script>
+  <script src="js/modules/settings.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
